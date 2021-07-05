@@ -1,11 +1,19 @@
-// 난무하는 중첩함수
+// 계산 단계와 포맷팅 단계 분리하기
 
 const invoices = require("./invoices");
 const plays = require("./plays");
 
 function statement(invoice, plays) {
-	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-	for (let perf of invoice.performances) {
+	const statementData = {}; // 중간 데이터 구조를 인수로 전달
+	statementData.customer = invoice.customer;
+	statementData.performances = invoice.performances;
+	return renderPlainText(statementData, plays);
+}
+
+function renderPlainText(data, plays) {
+	// 중간 데이터 구조를 인수로 전달
+	let result = `청구 내역 (고객명: ${data.customer})\n`; // 고객 데이터를 중간 데이터로부터 얻음
+	for (let perf of data.performances) {
 		result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${
 			perf.audience
 		}석)\n`;
@@ -24,7 +32,7 @@ function statement(invoice, plays) {
 
 	function totalVolumeCredits() {
 		let result = 0;
-		for (let perf of invoice.performances) {
+		for (let perf of data.performances) {
 			result += volumeCreditsFor(perf);
 		}
 		return result;
@@ -32,7 +40,7 @@ function statement(invoice, plays) {
 
 	function totalAmount() {
 		let result = 0;
-		for (let perf of invoice.performances) {
+		for (let perf of data.performances) {
 			result += amountFor(perf);
 		}
 		return result;
@@ -70,11 +78,18 @@ function statement(invoice, plays) {
 				throw new Error(`알 수 없는 장르: ${playFor(perf).type}`);
 		}
 		return result;
-	} // amountFor 종료
-} // statement 종료
+	}
+}
 
 // 실행
-
 invoices.forEach(invoice => {
 	console.log(statement(invoice, plays));
 });
+
+const expectedResult = `
+청구 내역 (고객명: BigCo)
+Hamlet: $650.00 (55석)
+As You Like It: $580.00 (35석)
+Othello: $500.00 (40석)
+총액: $1,730.00
+적립 포인트: 47점`;
