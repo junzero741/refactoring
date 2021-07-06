@@ -1,4 +1,4 @@
-// 반복문을 파이프라인으로 바꾸기 (미완)
+// 반복문을 파이프라인으로 바꾸기
 
 const invoices = require("./invoices");
 const plays = require("./plays");
@@ -20,19 +20,13 @@ function statement(invoice, plays) {
 	}
 
 	function totalVolumeCredits(data) {
-		let result = 0;
-		for (let perf of data.performances) {
-			result += perf.volumeCredits;
-		}
-		return result;
+		// for 반복문을 파이프라인으로 바꿈
+		return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
 	}
 
 	function totalAmount(data) {
-		let result = 0;
-		for (let perf of data.performances) {
-			result += perf.amount;
-		}
-		return result;
+		// for 반복문을 파이프라인으로 바꿈
+		return data.performances.reduce((total, p) => total + p.amount, 0);
 	}
 
 	function volumeCreditsFor(aPerformance) {
