@@ -1,5 +1,4 @@
 class PerformanceCalculator {
-	// 최상위에 계산기 클래스 생성
 	constructor(aPerformance, aPlay) {
 		this.performance = aPerformance;
 		this.play = aPlay;
@@ -40,6 +39,22 @@ class PerformanceCalculator {
 	}
 }
 
+class TragedyCalculator extends PerformanceCalculator {}
+
+class ComedyCalculator extends PerformanceCalculator {}
+
+function createPerformanceCalculator(aPerformance, aPlay) {
+	// 팩토리 함수 생성
+	switch (aPlay.type) {
+		case "tragedy":
+			return new TragedyCalculator(aPerformance, aPlay);
+		case "comedy":
+			return new ComedyCalculator(aPerformance, aPlay);
+		default:
+			throw new Error(`알 수 없는 장르: ${aPlay.type}`);
+	}
+}
+
 export default function createStatementData(invoice, plays) {
 	const result = {};
 	result.customer = invoice.customer;
@@ -49,7 +64,8 @@ export default function createStatementData(invoice, plays) {
 	return result;
 
 	function enrichPerformance(aPerformance) {
-		const calculator = new PerformanceCalculator(
+		const calculator = createPerformanceCalculator(
+			// 생성자 대신 팩토리 함수 이용
 			aPerformance,
 			playFor(aPerformance)
 		); // 공연료 계산기 생성
