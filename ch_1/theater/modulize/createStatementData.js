@@ -5,46 +5,39 @@ class PerformanceCalculator {
 	}
 
 	get amount() {
-		// amountFor() 함수의 코드를 계산기 클래스로 복사
-		let result = 0;
-		switch (
-			this.play.type // amountFor() 함수가 매개변수로 받던 정보를 계산기 필드에서 바로 얻음
-		) {
-			case "tragedy":
-				result = 40000;
-				if (this.performance.audience > 30) {
-					result += 1000 * (this.performance.audience - 30);
-				}
-				break;
-			case "comedy":
-				result = 30000;
-				if (this.performance.audience > 20) {
-					result += 10000 + 500 * (this.performance.audience - 20);
-				}
-				result += 300 * this.performance.audience;
-				break;
-			default:
-				throw new Error(`알 수 없는 장르: ${this.play.type}`);
-		}
-		return result;
+		throw new Error("서브클래스에서 처리하도록 설계되었습니다");
 	}
 
 	get volumeCredits() {
-		// volumeCreditsFor() 함수의 코드를 계산기 클래스로 복사
-		let result = 0;
-		result += Math.max(this.performance.audience - 30, 0); // volumeCreditsFor() 함수가 매개변수로 받던 정보를 계산기 필드에서 바로 얻음
-		if ("comedy" === this.play.type)
-			result += Math.floor(this.performance.audience / 5);
+		return Math.max(this.performance.audience - 30, 0);
+	}
+}
+
+class TragedyCalculator extends PerformanceCalculator {
+	get amount() {
+		let result = 40000;
+		if (this.performance.audience > 30) {
+			result += 1000 * (this.performance.audience - 30);
+		}
 		return result;
 	}
 }
 
-class TragedyCalculator extends PerformanceCalculator {}
+class ComedyCalculator extends PerformanceCalculator {
+	get amount() {
+		let result = 30000;
+		if (this.performance.audience > 20) {
+			result += 10000 + 500 * (this.performance.audience - 20);
+		}
+		result += 300 * this.performance.audience;
+	}
 
-class ComedyCalculator extends PerformanceCalculator {}
+	get volumeCredits() {
+		return super.volumeCredits + Math.floor(this.performance.audience / 5);
+	}
+}
 
 function createPerformanceCalculator(aPerformance, aPlay) {
-	// 팩토리 함수 생성
 	switch (aPlay.type) {
 		case "tragedy":
 			return new TragedyCalculator(aPerformance, aPlay);
